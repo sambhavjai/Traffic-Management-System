@@ -27,9 +27,13 @@ simple master
 simple slave
 {
     parameters:
-
+		//int count_of_cars;
     gates:
         inout gate;
+}
+channel data_flow extends ned.DelayChannel
+{
+    delay=100ms;
 }
 network traffic_management
 {
