@@ -27,7 +27,7 @@ simple master
 simple slave
 {
     parameters:
-		//int count_of_cars;
+		int count_of_cars;
     gates:
         inout gate;
 }

@@ -27,7 +27,8 @@
  * message Outgoing
  * {
  *     \@customize(true);  // see the generated C++ header for more info
- *     int node_id;
+ *     bool request;
+ *     string node;
  *     int green_light_time;
  *     int red_light_time;
  * }
@@ -60,7 +61,8 @@
 class Outgoing_Base : public ::omnetpp::cMessage
 {
   protected:
-    int node_id;
+    bool request;
+    ::omnetpp::opp_string node;
     int green_light_time;
     int red_light_time;
 
@@ -83,8 +85,10 @@ class Outgoing_Base : public ::omnetpp::cMessage
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual int getNode_id() const;
-    virtual void setNode_id(int node_id);
+    virtual bool getRequest() const;
+    virtual void setRequest(bool request);
+    virtual const char * getNode() const;
+    virtual void setNode(const char * node);
     virtual int getGreen_light_time() const;
     virtual void setGreen_light_time(int green_light_time);
     virtual int getRed_light_time() const;

@@ -179,7 +179,6 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 
 Incoming_Base::Incoming_Base(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
-    this->node_id = 0;
     this->count_of_cars = 0;
 }
 
@@ -202,32 +201,32 @@ Incoming_Base& Incoming_Base::operator=(const Incoming_Base& other)
 
 void Incoming_Base::copy(const Incoming_Base& other)
 {
-    this->node_id = other.node_id;
+    this->node = other.node;
     this->count_of_cars = other.count_of_cars;
 }
 
 void Incoming_Base::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cPacket::parsimPack(b);
-    doParsimPacking(b,this->node_id);
+    doParsimPacking(b,this->node);
     doParsimPacking(b,this->count_of_cars);
 }
 
 void Incoming_Base::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cPacket::parsimUnpack(b);
-    doParsimUnpacking(b,this->node_id);
+    doParsimUnpacking(b,this->node);
     doParsimUnpacking(b,this->count_of_cars);
 }
 
-int Incoming_Base::getNode_id() const
+const char * Incoming_Base::getNode() const
 {
-    return this->node_id;
+    return this->node.c_str();
 }
 
-void Incoming_Base::setNode_id(int node_id)
+void Incoming_Base::setNode(const char * node)
 {
-    this->node_id = node_id;
+    this->node = node;
 }
 
 int Incoming_Base::getCount_of_cars() const
@@ -333,7 +332,7 @@ const char *IncomingDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "node_id",
+        "node",
         "count_of_cars",
     };
     return (field>=0 && field<2) ? fieldNames[field] : nullptr;
@@ -343,7 +342,7 @@ int IncomingDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='n' && strcmp(fieldName, "node_id")==0) return base+0;
+    if (fieldName[0]=='n' && strcmp(fieldName, "node")==0) return base+0;
     if (fieldName[0]=='c' && strcmp(fieldName, "count_of_cars")==0) return base+1;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
@@ -357,7 +356,7 @@ const char *IncomingDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int",
+        "string",
         "int",
     };
     return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
@@ -427,7 +426,7 @@ std::string IncomingDescriptor::getFieldValueAsString(void *object, int field, i
     }
     Incoming_Base *pp = (Incoming_Base *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getNode_id());
+        case 0: return oppstring2string(pp->getNode());
         case 1: return long2string(pp->getCount_of_cars());
         default: return "";
     }
@@ -443,7 +442,7 @@ bool IncomingDescriptor::setFieldValueAsString(void *object, int field, int i, c
     }
     Incoming_Base *pp = (Incoming_Base *)object; (void)pp;
     switch (field) {
-        case 0: pp->setNode_id(string2long(value)); return true;
+        case 0: pp->setNode((value)); return true;
         case 1: pp->setCount_of_cars(string2long(value)); return true;
         default: return false;
     }

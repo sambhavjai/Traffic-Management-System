@@ -18,7 +18,8 @@
 //
 message Outgoing {
     @customize(true);  // see the generated C++ header for more info
-    int node_id;
+    bool request;
+    string node;
     int green_light_time;
     int red_light_time;
 }

@@ -179,7 +179,7 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 
 Outgoing_Base::Outgoing_Base(const char *name, short kind) : ::omnetpp::cMessage(name,kind)
 {
-    this->node_id = 0;
+    this->request = false;
     this->green_light_time = 0;
     this->red_light_time = 0;
 }
@@ -203,7 +203,8 @@ Outgoing_Base& Outgoing_Base::operator=(const Outgoing_Base& other)
 
 void Outgoing_Base::copy(const Outgoing_Base& other)
 {
-    this->node_id = other.node_id;
+    this->request = other.request;
+    this->node = other.node;
     this->green_light_time = other.green_light_time;
     this->red_light_time = other.red_light_time;
 }
@@ -211,7 +212,8 @@ void Outgoing_Base::copy(const Outgoing_Base& other)
 void Outgoing_Base::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::omnetpp::cMessage::parsimPack(b);
-    doParsimPacking(b,this->node_id);
+    doParsimPacking(b,this->request);
+    doParsimPacking(b,this->node);
     doParsimPacking(b,this->green_light_time);
     doParsimPacking(b,this->red_light_time);
 }
@@ -219,19 +221,30 @@ void Outgoing_Base::parsimPack(omnetpp::cCommBuffer *b) const
 void Outgoing_Base::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::omnetpp::cMessage::parsimUnpack(b);
-    doParsimUnpacking(b,this->node_id);
+    doParsimUnpacking(b,this->request);
+    doParsimUnpacking(b,this->node);
     doParsimUnpacking(b,this->green_light_time);
     doParsimUnpacking(b,this->red_light_time);
 }
 
-int Outgoing_Base::getNode_id() const
+bool Outgoing_Base::getRequest() const
 {
-    return this->node_id;
+    return this->request;
 }
 
-void Outgoing_Base::setNode_id(int node_id)
+void Outgoing_Base::setRequest(bool request)
 {
-    this->node_id = node_id;
+    this->request = request;
+}
+
+const char * Outgoing_Base::getNode() const
+{
+    return this->node.c_str();
+}
+
+void Outgoing_Base::setNode(const char * node)
+{
+    this->node = node;
 }
 
 int Outgoing_Base::getGreen_light_time() const
@@ -320,7 +333,7 @@ const char *OutgoingDescriptor::getProperty(const char *propertyname) const
 int OutgoingDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount() : 3;
+    return basedesc ? 4+basedesc->getFieldCount() : 4;
 }
 
 unsigned int OutgoingDescriptor::getFieldTypeFlags(int field) const
@@ -335,8 +348,9 @@ unsigned int OutgoingDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *OutgoingDescriptor::getFieldName(int field) const
@@ -348,20 +362,22 @@ const char *OutgoingDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "node_id",
+        "request",
+        "node",
         "green_light_time",
         "red_light_time",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<4) ? fieldNames[field] : nullptr;
 }
 
 int OutgoingDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='n' && strcmp(fieldName, "node_id")==0) return base+0;
-    if (fieldName[0]=='g' && strcmp(fieldName, "green_light_time")==0) return base+1;
-    if (fieldName[0]=='r' && strcmp(fieldName, "red_light_time")==0) return base+2;
+    if (fieldName[0]=='r' && strcmp(fieldName, "request")==0) return base+0;
+    if (fieldName[0]=='n' && strcmp(fieldName, "node")==0) return base+1;
+    if (fieldName[0]=='g' && strcmp(fieldName, "green_light_time")==0) return base+2;
+    if (fieldName[0]=='r' && strcmp(fieldName, "red_light_time")==0) return base+3;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -374,11 +390,12 @@ const char *OutgoingDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int",
+        "bool",
+        "string",
         "int",
         "int",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **OutgoingDescriptor::getFieldPropertyNames(int field) const
@@ -445,9 +462,10 @@ std::string OutgoingDescriptor::getFieldValueAsString(void *object, int field, i
     }
     Outgoing_Base *pp = (Outgoing_Base *)object; (void)pp;
     switch (field) {
-        case 0: return long2string(pp->getNode_id());
-        case 1: return long2string(pp->getGreen_light_time());
-        case 2: return long2string(pp->getRed_light_time());
+        case 0: return bool2string(pp->getRequest());
+        case 1: return oppstring2string(pp->getNode());
+        case 2: return long2string(pp->getGreen_light_time());
+        case 3: return long2string(pp->getRed_light_time());
         default: return "";
     }
 }
@@ -462,9 +480,10 @@ bool OutgoingDescriptor::setFieldValueAsString(void *object, int field, int i, c
     }
     Outgoing_Base *pp = (Outgoing_Base *)object; (void)pp;
     switch (field) {
-        case 0: pp->setNode_id(string2long(value)); return true;
-        case 1: pp->setGreen_light_time(string2long(value)); return true;
-        case 2: pp->setRed_light_time(string2long(value)); return true;
+        case 0: pp->setRequest(string2bool(value)); return true;
+        case 1: pp->setNode((value)); return true;
+        case 2: pp->setGreen_light_time(string2long(value)); return true;
+        case 3: pp->setRed_light_time(string2long(value)); return true;
         default: return false;
     }
 }

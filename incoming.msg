@@ -18,6 +18,6 @@
 //
 packet Incoming {
     @customize(true);  // see the generated C++ header for more info
-    int node_id;
+    string node;
     int count_of_cars;
 }

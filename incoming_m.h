@@ -27,7 +27,7 @@
  * packet Incoming
  * {
  *     \@customize(true);  // see the generated C++ header for more info
- *     int node_id;
+ *     string node;
  *     int count_of_cars;
  * }
  * </pre>
@@ -59,7 +59,7 @@
 class Incoming_Base : public ::omnetpp::cPacket
 {
   protected:
-    int node_id;
+    ::omnetpp::opp_string node;
     int count_of_cars;
 
   private:
@@ -81,8 +81,8 @@ class Incoming_Base : public ::omnetpp::cPacket
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual int getNode_id() const;
-    virtual void setNode_id(int node_id);
+    virtual const char * getNode() const;
+    virtual void setNode(const char * node);
     virtual int getCount_of_cars() const;
     virtual void setCount_of_cars(int count_of_cars);
 };
