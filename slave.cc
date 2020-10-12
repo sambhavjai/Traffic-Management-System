@@ -17,13 +17,17 @@ Register_Class(incoming_message);
 class slave: public cSimpleModule
 {
 public:
-    //int count_of_cars=5;
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
+    virtual void handleParameterChange(const char *parname) override;
 };
 Define_Module(slave);
 void slave::initialize()
 {
+}
+void slave::handleParameterChange(const char *parname)
+{
+
 }
 void slave::handleMessage(cMessage *msg)
 {
@@ -39,9 +43,5 @@ void slave::handleMessage(cMessage *msg)
     else
     {
         EV<<"Message received at node "<<getName()<<"with green light time"<<imsg->getGreen_light_time();
-//        if(strcmp(imsg->getNode(),getName())==0)
-//        {
-//            int green_light=imsg->getGreen_light_time();
-//        }
     }
 }
