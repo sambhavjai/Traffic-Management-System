@@ -20,14 +20,16 @@ public:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleParameterChange(const char *parname) override;
+    void reset_para();
 };
 Define_Module(slave);
 void slave::initialize()
-{
-}
+{}
 void slave::handleParameterChange(const char *parname)
+{}
+void slave::reset_para()
 {
-
+    par("count_of_cars").setIntValue(intuniform(0,10));
 }
 void slave::handleMessage(cMessage *msg)
 {
@@ -42,7 +44,10 @@ void slave::handleMessage(cMessage *msg)
     }
     else
     {
-        EV<<"Message received at node "<<getName()<<"with green light time"<<imsg->getGreen_light_time();
-        //par("count_of_cars").setIntValue(10);
+        if(strcmp(imsg->getNode(),getName())==0)
+        {
+            EV<<"Message received at node "<<imsg->getNode()<<"with green light time"<<imsg->getGreen_light_time();
+        }
+        reset_para();
     }
 }

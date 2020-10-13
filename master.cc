@@ -66,19 +66,10 @@ void master::handleMessage(cMessage *msg)
             omsg->setNode(a->getNode());
             omsg->setGreen_light_time(a->getCount_of_cars());
             this->green_light=omsg->getGreen_light_time();
-            string name=omsg->getNode();
-            if(name.find("1") != string::npos) {
-                send(omsg,"gate1$o");
-            }
-            else if(name.find("2") != string::npos) {
-                send(omsg,"gate2$o");
-            }
-            else if(name.find("3") != string::npos) {
-                send(omsg,"gate3$o");
-            }
-            else if(name.find("4") != string::npos) {
-                send(omsg,"gate4$o");
-            }
+            send(omsg,"gate1$o");
+            send(omsg->dup(),"gate2$o");
+            send(omsg->dup(),"gate3$o");
+            send(omsg->dup(),"gate4$o");
             q->clear();
             this->send_request();
     }
