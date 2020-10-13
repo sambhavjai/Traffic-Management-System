@@ -28,6 +28,7 @@ simple slave
 {
     parameters:
 		int count_of_cars;
+		bool emergency=default(false);
     gates:
         inout gate;
 }

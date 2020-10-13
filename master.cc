@@ -15,11 +15,16 @@ class incoming_message:public Incoming_Base
     virtual incoming_message *dup() const override {return new incoming_message(*this);}
 };
 int fun(cObject *a,cObject *b)
-    {
-            incoming_message *a1=(incoming_message*)a;
-            incoming_message *b1=(incoming_message*)b;
-            return b1->getCount_of_cars()-a1->getCount_of_cars();
-    }
+{
+      incoming_message *a1=(incoming_message*)a;
+      incoming_message *b1=(incoming_message*)b;
+      if(a1->getEmergency()==1)
+          return -1;
+      else if(b1->getEmergency()==1)
+          return 1;
+      else
+      return b1->getCount_of_cars()-a1->getCount_of_cars();
+}
 class master: public cSimpleModule
 {
 public:
@@ -52,15 +57,14 @@ void master::initialize()
     send(init_message,"gate1$o");
     this->send_request();
 }
-
 void master::handleMessage(cMessage *msg)
 {
     incoming_message *imsg = check_and_cast<incoming_message *>(msg);
     q->insert(imsg);
+    EV<<"Count of "<<imsg->getCount_of_cars()<<" cars received from node "<<imsg->getNode()<<" with emergency value "<<imsg->getEmergency()<<"\n";
     if(q->getLength()==4)
     {
             incoming_message *a=(incoming_message*)q->pop();
-            EV<<"Count of "<<a->getCount_of_cars()<<" cars received from node "<<a->getNode()<<"\n";
             outgoing_message *omsg=new outgoing_message();
             omsg->setRequest(false);
             omsg->setNode(a->getNode());

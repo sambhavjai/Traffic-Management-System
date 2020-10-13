@@ -180,6 +180,7 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
 Incoming_Base::Incoming_Base(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
 {
     this->count_of_cars = 0;
+    this->emergency = false;
 }
 
 Incoming_Base::Incoming_Base(const Incoming_Base& other) : ::omnetpp::cPacket(other)
@@ -203,6 +204,7 @@ void Incoming_Base::copy(const Incoming_Base& other)
 {
     this->node = other.node;
     this->count_of_cars = other.count_of_cars;
+    this->emergency = other.emergency;
 }
 
 void Incoming_Base::parsimPack(omnetpp::cCommBuffer *b) const
@@ -210,6 +212,7 @@ void Incoming_Base::parsimPack(omnetpp::cCommBuffer *b) const
     ::omnetpp::cPacket::parsimPack(b);
     doParsimPacking(b,this->node);
     doParsimPacking(b,this->count_of_cars);
+    doParsimPacking(b,this->emergency);
 }
 
 void Incoming_Base::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -217,6 +220,7 @@ void Incoming_Base::parsimUnpack(omnetpp::cCommBuffer *b)
     ::omnetpp::cPacket::parsimUnpack(b);
     doParsimUnpacking(b,this->node);
     doParsimUnpacking(b,this->count_of_cars);
+    doParsimUnpacking(b,this->emergency);
 }
 
 const char * Incoming_Base::getNode() const
@@ -237,6 +241,16 @@ int Incoming_Base::getCount_of_cars() const
 void Incoming_Base::setCount_of_cars(int count_of_cars)
 {
     this->count_of_cars = count_of_cars;
+}
+
+bool Incoming_Base::getEmergency() const
+{
+    return this->emergency;
+}
+
+void Incoming_Base::setEmergency(bool emergency)
+{
+    this->emergency = emergency;
 }
 
 class IncomingDescriptor : public omnetpp::cClassDescriptor
@@ -305,7 +319,7 @@ const char *IncomingDescriptor::getProperty(const char *propertyname) const
 int IncomingDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount() : 2;
+    return basedesc ? 3+basedesc->getFieldCount() : 3;
 }
 
 unsigned int IncomingDescriptor::getFieldTypeFlags(int field) const
@@ -319,8 +333,9 @@ unsigned int IncomingDescriptor::getFieldTypeFlags(int field) const
     static unsigned int fieldTypeFlags[] = {
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
 }
 
 const char *IncomingDescriptor::getFieldName(int field) const
@@ -334,8 +349,9 @@ const char *IncomingDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "node",
         "count_of_cars",
+        "emergency",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<3) ? fieldNames[field] : nullptr;
 }
 
 int IncomingDescriptor::findField(const char *fieldName) const
@@ -344,6 +360,7 @@ int IncomingDescriptor::findField(const char *fieldName) const
     int base = basedesc ? basedesc->getFieldCount() : 0;
     if (fieldName[0]=='n' && strcmp(fieldName, "node")==0) return base+0;
     if (fieldName[0]=='c' && strcmp(fieldName, "count_of_cars")==0) return base+1;
+    if (fieldName[0]=='e' && strcmp(fieldName, "emergency")==0) return base+2;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -358,8 +375,9 @@ const char *IncomingDescriptor::getFieldTypeString(int field) const
     static const char *fieldTypeStrings[] = {
         "string",
         "int",
+        "bool",
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<3) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **IncomingDescriptor::getFieldPropertyNames(int field) const
@@ -428,6 +446,7 @@ std::string IncomingDescriptor::getFieldValueAsString(void *object, int field, i
     switch (field) {
         case 0: return oppstring2string(pp->getNode());
         case 1: return long2string(pp->getCount_of_cars());
+        case 2: return bool2string(pp->getEmergency());
         default: return "";
     }
 }
@@ -444,6 +463,7 @@ bool IncomingDescriptor::setFieldValueAsString(void *object, int field, int i, c
     switch (field) {
         case 0: pp->setNode((value)); return true;
         case 1: pp->setCount_of_cars(string2long(value)); return true;
+        case 2: pp->setEmergency(string2bool(value)); return true;
         default: return false;
     }
 }

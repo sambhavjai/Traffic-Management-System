@@ -30,6 +30,13 @@ void slave::handleParameterChange(const char *parname)
 void slave::reset_para()
 {
     par("count_of_cars").setIntValue(intuniform(0,10));
+    int flag=intuniform(1,10);
+    if(flag<=3)
+    {
+        par("emergency").setBoolValue(true);
+    }
+    else
+        par("emergency").setBoolValue(false);
 }
 void slave::handleMessage(cMessage *msg)
 {
@@ -40,13 +47,14 @@ void slave::handleMessage(cMessage *msg)
         incoming_message *omsg=new incoming_message();
         omsg->setNode(getName());
         omsg->setCount_of_cars(par("count_of_cars").intValue());
+        omsg->setEmergency(par("emergency").boolValue());
         send(omsg,"gate$o");
     }
     else
     {
         if(strcmp(imsg->getNode(),getName())==0)
         {
-            EV<<"Message received at node "<<imsg->getNode()<<"with green light time"<<imsg->getGreen_light_time();
+            EV<<"Message received at node "<<imsg->getNode()<<"with green light time "<<imsg->getGreen_light_time();
         }
         reset_para();
     }

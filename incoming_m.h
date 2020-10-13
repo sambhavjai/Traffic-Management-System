@@ -29,6 +29,7 @@
  *     \@customize(true);  // see the generated C++ header for more info
  *     string node;
  *     int count_of_cars;
+ *     bool emergency;
  * }
  * </pre>
  *
@@ -61,6 +62,7 @@ class Incoming_Base : public ::omnetpp::cPacket
   protected:
     ::omnetpp::opp_string node;
     int count_of_cars;
+    bool emergency;
 
   private:
     void copy(const Incoming_Base& other);
@@ -85,6 +87,8 @@ class Incoming_Base : public ::omnetpp::cPacket
     virtual void setNode(const char * node);
     virtual int getCount_of_cars() const;
     virtual void setCount_of_cars(int count_of_cars);
+    virtual bool getEmergency() const;
+    virtual void setEmergency(bool emergency);
 };
 
 

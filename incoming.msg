@@ -20,4 +20,5 @@ packet Incoming {
     @customize(true);  // see the generated C++ header for more info
     string node;
     int count_of_cars;
+    bool emergency;
 }
