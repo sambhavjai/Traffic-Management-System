@@ -80,5 +80,6 @@ void master::handleMessage(cMessage *msg)
                 send(omsg,"gate4$o");
             }
             q->clear();
+            this->send_request();
     }
 }

@@ -43,5 +43,6 @@ void slave::handleMessage(cMessage *msg)
     else
     {
         EV<<"Message received at node "<<getName()<<"with green light time"<<imsg->getGreen_light_time();
+        //par("count_of_cars").setIntValue(10);
     }
 }
