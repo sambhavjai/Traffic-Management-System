@@ -18,6 +18,8 @@ int fun(cObject *a,cObject *b)
 {
       incoming_message *a1=(incoming_message*)a;
       incoming_message *b1=(incoming_message*)b;
+      if(a1->getEmergency()==1&&b1->getEmergency()==1)
+          return b1->getCount_of_cars()-a1->getCount_of_cars();
       if(a1->getEmergency()==1)
           return -1;
       else if(b1->getEmergency()==1)
