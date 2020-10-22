@@ -30,6 +30,7 @@
  *     string node;
  *     int count_of_cars;
  *     bool emergency;
+ *     bool starvation;
  * }
  * </pre>
  *
@@ -63,6 +64,7 @@ class Incoming_Base : public ::omnetpp::cPacket
     ::omnetpp::opp_string node;
     int count_of_cars;
     bool emergency;
+    bool starvation;
 
   private:
     void copy(const Incoming_Base& other);
@@ -89,6 +91,8 @@ class Incoming_Base : public ::omnetpp::cPacket
     virtual void setCount_of_cars(int count_of_cars);
     virtual bool getEmergency() const;
     virtual void setEmergency(bool emergency);
+    virtual bool getStarvation() const;
+    virtual void setStarvation(bool starvation);
 };
 
 

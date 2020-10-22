@@ -18,11 +18,17 @@ int fun(cObject *a,cObject *b)
 {
       incoming_message *a1=(incoming_message*)a;
       incoming_message *b1=(incoming_message*)b;
-      if(a1->getEmergency()==1&&b1->getEmergency()==1)
-          return b1->getCount_of_cars()-a1->getCount_of_cars();
+      if(a1->getEmergency()==1 && b1->getEmergency()==1)
+          return b1->getCount_of_cars() - a1->getCount_of_cars();
       if(a1->getEmergency()==1)
           return -1;
       else if(b1->getEmergency()==1)
+          return 1;
+      else if(a1->getStarvation()==1 && b1->getStarvation()==1)
+          return b1->getCount_of_cars() - a1->getCount_of_cars();
+      else if(a1->getStarvation()==1)
+          return -1;
+      else if(b1->getStarvation()==1)
           return 1;
       else
       return b1->getCount_of_cars()-a1->getCount_of_cars();
@@ -63,7 +69,7 @@ void master::handleMessage(cMessage *msg)
 {
     incoming_message *imsg = check_and_cast<incoming_message *>(msg);
     q->insert(imsg);
-    EV<<"Count of "<<imsg->getCount_of_cars()<<" cars received from node "<<imsg->getNode()<<" with emergency value "<<imsg->getEmergency()<<"\n";
+    EV<<"Count of "<<imsg->getCount_of_cars()<<" cars received from node "<<imsg->getNode()<<" with emergency value "<<imsg->getEmergency()<<" and starvation value "<<imsg->getStarvation()<<"\n";
     if(q->getLength()==4)
     {
             incoming_message *a=(incoming_message*)q->pop();

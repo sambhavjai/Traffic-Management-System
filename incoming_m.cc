@@ -181,6 +181,7 @@ Incoming_Base::Incoming_Base(const char *name, short kind) : ::omnetpp::cPacket(
 {
     this->count_of_cars = 0;
     this->emergency = false;
+    this->starvation = false;
 }
 
 Incoming_Base::Incoming_Base(const Incoming_Base& other) : ::omnetpp::cPacket(other)
@@ -205,6 +206,7 @@ void Incoming_Base::copy(const Incoming_Base& other)
     this->node = other.node;
     this->count_of_cars = other.count_of_cars;
     this->emergency = other.emergency;
+    this->starvation = other.starvation;
 }
 
 void Incoming_Base::parsimPack(omnetpp::cCommBuffer *b) const
@@ -213,6 +215,7 @@ void Incoming_Base::parsimPack(omnetpp::cCommBuffer *b) const
     doParsimPacking(b,this->node);
     doParsimPacking(b,this->count_of_cars);
     doParsimPacking(b,this->emergency);
+    doParsimPacking(b,this->starvation);
 }
 
 void Incoming_Base::parsimUnpack(omnetpp::cCommBuffer *b)
@@ -221,6 +224,7 @@ void Incoming_Base::parsimUnpack(omnetpp::cCommBuffer *b)
     doParsimUnpacking(b,this->node);
     doParsimUnpacking(b,this->count_of_cars);
     doParsimUnpacking(b,this->emergency);
+    doParsimUnpacking(b,this->starvation);
 }
 
 const char * Incoming_Base::getNode() const
@@ -251,6 +255,16 @@ bool Incoming_Base::getEmergency() const
 void Incoming_Base::setEmergency(bool emergency)
 {
     this->emergency = emergency;
+}
+
+bool Incoming_Base::getStarvation() const
+{
+    return this->starvation;
+}
+
+void Incoming_Base::setStarvation(bool starvation)
+{
+    this->starvation = starvation;
 }
 
 class IncomingDescriptor : public omnetpp::cClassDescriptor
@@ -319,7 +333,7 @@ const char *IncomingDescriptor::getProperty(const char *propertyname) const
 int IncomingDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 3+basedesc->getFieldCount() : 3;
+    return basedesc ? 4+basedesc->getFieldCount() : 4;
 }
 
 unsigned int IncomingDescriptor::getFieldTypeFlags(int field) const
@@ -334,8 +348,9 @@ unsigned int IncomingDescriptor::getFieldTypeFlags(int field) const
         FD_ISEDITABLE,
         FD_ISEDITABLE,
         FD_ISEDITABLE,
+        FD_ISEDITABLE,
     };
-    return (field>=0 && field<3) ? fieldTypeFlags[field] : 0;
+    return (field>=0 && field<4) ? fieldTypeFlags[field] : 0;
 }
 
 const char *IncomingDescriptor::getFieldName(int field) const
@@ -350,8 +365,9 @@ const char *IncomingDescriptor::getFieldName(int field) const
         "node",
         "count_of_cars",
         "emergency",
+        "starvation",
     };
-    return (field>=0 && field<3) ? fieldNames[field] : nullptr;
+    return (field>=0 && field<4) ? fieldNames[field] : nullptr;
 }
 
 int IncomingDescriptor::findField(const char *fieldName) const
@@ -361,6 +377,7 @@ int IncomingDescriptor::findField(const char *fieldName) const
     if (fieldName[0]=='n' && strcmp(fieldName, "node")==0) return base+0;
     if (fieldName[0]=='c' && strcmp(fieldName, "count_of_cars")==0) return base+1;
     if (fieldName[0]=='e' && strcmp(fieldName, "emergency")==0) return base+2;
+    if (fieldName[0]=='s' && strcmp(fieldName, "starvation")==0) return base+3;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -376,8 +393,9 @@ const char *IncomingDescriptor::getFieldTypeString(int field) const
         "string",
         "int",
         "bool",
+        "bool",
     };
-    return (field>=0 && field<3) ? fieldTypeStrings[field] : nullptr;
+    return (field>=0 && field<4) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **IncomingDescriptor::getFieldPropertyNames(int field) const
@@ -447,6 +465,7 @@ std::string IncomingDescriptor::getFieldValueAsString(void *object, int field, i
         case 0: return oppstring2string(pp->getNode());
         case 1: return long2string(pp->getCount_of_cars());
         case 2: return bool2string(pp->getEmergency());
+        case 3: return bool2string(pp->getStarvation());
         default: return "";
     }
 }
@@ -464,6 +483,7 @@ bool IncomingDescriptor::setFieldValueAsString(void *object, int field, int i, c
         case 0: pp->setNode((value)); return true;
         case 1: pp->setCount_of_cars(string2long(value)); return true;
         case 2: pp->setEmergency(string2bool(value)); return true;
+        case 3: pp->setStarvation(string2bool(value)); return true;
         default: return false;
     }
 }

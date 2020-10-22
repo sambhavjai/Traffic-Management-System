@@ -21,4 +21,5 @@ packet Incoming {
     string node;
     int count_of_cars;
     bool emergency;
+    bool starvation;
 }
