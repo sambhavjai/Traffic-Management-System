@@ -37,6 +37,7 @@ class master: public cSimpleModule
 {
 public:
     int green_light;
+    double timeForavehicle=1.5;
     void send_request();
     int (*fun_ptr)(cObject *,cObject *) = &fun;
     cQueue *q=new cQueue("queue",fun_ptr);
@@ -76,7 +77,7 @@ void master::handleMessage(cMessage *msg)
             outgoing_message *omsg=new outgoing_message();
             omsg->setRequest(false);
             omsg->setNode(a->getNode());
-            omsg->setGreen_light_time(a->getCount_of_cars());
+            omsg->setGreen_light_time((int)(a->getCount_of_cars()*this->timeForavehicle));
             this->green_light=omsg->getGreen_light_time();
             send(omsg,"gate1$o");
             send(omsg->dup(),"gate2$o");

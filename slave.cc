@@ -24,6 +24,7 @@ public:
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleParameterChange(const char *parname) override;
     void reset_para();
+    void update_para(int green_light_time);
 };
 Define_Module(slave);
 void slave::initialize()
@@ -43,6 +44,22 @@ void slave::reset_para()
     }
     else
         par("emergency").setBoolValue(false);
+    starvation=false;
+}
+void slave::update_para(int green_light_time)
+{
+    int count=par("count_of_cars").intValue();
+    int update_value=(count*green_light_time)/100;
+    if(update_value>50)
+        update_value=50;
+    par("count_of_cars").setIntValue(count+update_value);
+    int flag=intuniform(1,100);
+    if(flag<=5)
+    {
+       par("emergency").setBoolValue(true);
+    }
+    else
+       par("emergency").setBoolValue(false);
 }
 void slave::handleMessage(cMessage *msg)
 {
@@ -63,6 +80,7 @@ void slave::handleMessage(cMessage *msg)
         {
             EV<<"Message received at node "<<imsg->getNode()<<"with green light time "<<imsg->getGreen_light_time();
             this->red_light_time=0;
+            reset_para();
         }
         else
         {
@@ -73,7 +91,7 @@ void slave::handleMessage(cMessage *msg)
             }
             else
                 this->starvation=false;
+            update_para(imsg->getGreen_light_time());
         }
-        reset_para();
     }
 }
