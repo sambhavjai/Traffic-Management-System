@@ -37,7 +37,7 @@ class master: public cSimpleModule
 {
 public:
     int green_light;
-    double timeForavehicle=1.5;
+    double timeForavehicle=0.776;
     void send_request();
     int (*fun_ptr)(cObject *,cObject *) = &fun;
     cQueue *q=new cQueue("queue",fun_ptr);

@@ -18,11 +18,17 @@ class slave: public cSimpleModule
 {
 public:
     int red_light_time=0;
-    int starvation_limit=95;
+    int starvation_limit=104;
     bool starvation=false;
+    // Alpha calculation
+    cLongHistogram GreenLightStats;
+    cLongHistogram countStats;
+    long sum_count_of_car=0;
+    //
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleParameterChange(const char *parname) override;
+    virtual void finish() override;
     void reset_para();
     void update_para(int green_light_time);
 };
@@ -31,6 +37,10 @@ void slave::initialize()
 {}
 void slave::handleParameterChange(const char *parname)
 {}
+void slave::finish()
+{
+    EV<<getName()<<" "<<sum_count_of_car<<"    ";
+}
 void slave::reset_para()
 {
     double meanOfCountofcars= 24.546;
@@ -79,6 +89,11 @@ void slave::handleMessage(cMessage *msg)
         if(strcmp(imsg->getNode(),getName())==0)
         {
             EV<<"Message received at node "<<imsg->getNode()<<"with green light time "<<imsg->getGreen_light_time();
+            //Alpha calculation
+            GreenLightStats.collect(imsg->getGreen_light_time());
+            countStats.collect(par("count_of_cars").intValue());
+            sum_count_of_car=sum_count_of_car+par("count_of_cars").intValue();
+            //
             this->red_light_time=0;
             reset_para();
         }
