@@ -19,10 +19,7 @@ simple master
 
         @display("i=abstract/multicast");
     gates:
-        inout gate1;
-        inout gate2;
-        inout gate3;
-        inout gate4;
+        input gate1 @directIn;
 }
 simple slave
 {
@@ -30,7 +27,7 @@ simple slave
 		int count_of_cars;
 		bool emergency=default(false);
     gates:
-        inout gate;
+        input gate @directIn;
 }
 channel data_flow extends ned.DelayChannel
 {
@@ -55,10 +52,6 @@ network traffic_management
             @display("p=287,353");
         }
     connections:
-        master.gate1 <--> traffic_light1.gate;
-        master.gate2 <--> traffic_light2.gate;
-        master.gate3 <--> traffic_light3.gate;
-        master.gate4 <--> traffic_light4.gate;
 }
 
 

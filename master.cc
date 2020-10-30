@@ -41,6 +41,10 @@ public:
     void send_request();
     int (*fun_ptr)(cObject *,cObject *) = &fun;
     cQueue *q=new cQueue("queue",fun_ptr);
+    cModule *light1;
+    cModule *light2;
+    cModule *light3;
+    cModule *light4;
 protected:
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
@@ -50,20 +54,24 @@ void master::send_request()
 {
         outgoing_message *init_request=new outgoing_message();
         init_request->setRequest(true);
-        sendDelayed(init_request,this->green_light,"gate1$o");
-        sendDelayed(init_request->dup(),this->green_light,"gate2$o");
-        sendDelayed(init_request->dup(),this->green_light,"gate3$o");
-        sendDelayed(init_request->dup(),this->green_light,"gate4$o");
+        sendDirect(init_request,this->green_light,0,light1->gate("gate"));
+        sendDirect(init_request->dup(),this->green_light,0,light2->gate("gate"));
+        sendDirect(init_request->dup(),this->green_light,0,light3->gate("gate"));
+        sendDirect(init_request->dup(),this->green_light,0,light4->gate("gate"));
 }
 void master::initialize()
 {
+    light1=getModuleByPath("traffic_light1");
+    light2=getModuleByPath("traffic_light2");
+    light3=getModuleByPath("traffic_light3");
+    light4=getModuleByPath("traffic_light4");
     outgoing_message *init_message = new outgoing_message();
     init_message->setRequest(false);
     init_message->setNode("traffic_light1");
     init_message->setGreen_light_time(10);
     init_message->setRed_light_time(0);
     this->green_light=10;
-    send(init_message,"gate1$o");
+    sendDirect(init_message,light1->gate("gate"));
     this->send_request();
 }
 void master::handleMessage(cMessage *msg)
@@ -79,10 +87,10 @@ void master::handleMessage(cMessage *msg)
             omsg->setNode(a->getNode());
             omsg->setGreen_light_time((int)(a->getCount_of_cars()*this->timeForavehicle));
             this->green_light=omsg->getGreen_light_time();
-            send(omsg,"gate1$o");
-            send(omsg->dup(),"gate2$o");
-            send(omsg->dup(),"gate3$o");
-            send(omsg->dup(),"gate4$o");
+            sendDirect(omsg,light1->gate("gate"));
+            sendDirect(omsg->dup(),light2->gate("gate"));
+            sendDirect(omsg->dup(),light3->gate("gate"));
+            sendDirect(omsg->dup(),light4->gate("gate"));
             q->clear();
             this->send_request();
     }

@@ -20,10 +20,11 @@ public:
     int red_light_time=0;
     int starvation_limit=104;
     bool starvation=false;
+    cModule *master;
     // Alpha calculation
-    cLongHistogram GreenLightStats;
-    cLongHistogram countStats;
-    long sum_count_of_car=0;
+    //    cLongHistogram GreenLightStats;
+    //    cLongHistogram countStats;
+    //    long sum_count_of_car=0;
     //
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
@@ -34,12 +35,14 @@ public:
 };
 Define_Module(slave);
 void slave::initialize()
-{}
+{
+    master= getModuleByPath("master");
+}
 void slave::handleParameterChange(const char *parname)
 {}
 void slave::finish()
 {
-    EV<<getName()<<" "<<sum_count_of_car<<"    ";
+   // EV<<getName()<<" "<<sum_count_of_car<<"    ";
 }
 void slave::reset_para()
 {
@@ -82,7 +85,7 @@ void slave::handleMessage(cMessage *msg)
         omsg->setCount_of_cars(par("count_of_cars").intValue());
         omsg->setEmergency(par("emergency").boolValue());
         omsg->setStarvation(this->starvation);
-        send(omsg,"gate$o");
+        sendDirect(omsg,master->gate("gate1"));
     }
     else
     {
@@ -90,9 +93,9 @@ void slave::handleMessage(cMessage *msg)
         {
             EV<<"Message received at node "<<imsg->getNode()<<"with green light time "<<imsg->getGreen_light_time();
             //Alpha calculation
-            GreenLightStats.collect(imsg->getGreen_light_time());
-            countStats.collect(par("count_of_cars").intValue());
-            sum_count_of_car=sum_count_of_car+par("count_of_cars").intValue();
+//            GreenLightStats.collect(imsg->getGreen_light_time());
+//            countStats.collect(par("count_of_cars").intValue());
+//            sum_count_of_car=sum_count_of_car+par("count_of_cars").intValue();
             //
             this->red_light_time=0;
             reset_para();
