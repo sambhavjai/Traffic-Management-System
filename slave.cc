@@ -26,6 +26,12 @@ public:
     //    cLongHistogram countStats;
     //    long sum_count_of_car=0;
     //
+
+    //Result calculation
+        double average_waiting_time=0;
+        double count=0.0;
+        int emergency_count=0;
+    //
     virtual void initialize() override;
     virtual void handleMessage(cMessage *msg) override;
     virtual void handleParameterChange(const char *parname) override;
@@ -43,6 +49,8 @@ void slave::handleParameterChange(const char *parname)
 void slave::finish()
 {
    // EV<<getName()<<" "<<sum_count_of_car<<"    ";
+    EV<<"Average waiting time at "<<getName()<<" = "<<(average_waiting_time/count)<<endl;
+    EV<<"Number of emergency vehicles passed"<<emergency_count<<endl;
 }
 void slave::reset_para()
 {
@@ -97,11 +105,22 @@ void slave::handleMessage(cMessage *msg)
 //            countStats.collect(par("count_of_cars").intValue());
 //            sum_count_of_car=sum_count_of_car+par("count_of_cars").intValue();
             //
+            //Result calculation
+                if(par("emergency").boolValue()==1)
+                {
+                    emergency_count++;
+                }
+            //
             this->red_light_time=0;
             reset_para();
         }
         else
         {
+            // Result calculation
+                double current_waiting_time = (double)(imsg->getGreen_light_time());
+                average_waiting_time=average_waiting_time+current_waiting_time;
+                count++;
+            //
             this->red_light_time=this->red_light_time+imsg->getGreen_light_time();
             if(this->red_light_time >= this->starvation_limit)
             {
